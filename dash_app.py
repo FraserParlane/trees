@@ -35,34 +35,55 @@ for i, color in enumerate(colors):
         mode='markers',
         marker=dict(
             color=color,
-        )
+            size=4,
+        ),
+        name=name.title(),
     )
 
     # Add to figure
     fig.add_trace(scatter)
 
-# scat = go.Scatter(
-#         x=df['lon'],
-#         y=df['lat'],
-#         mode='markers',
-#         marker=dict(color='grey'),
-# )
-# fig.add_trace(
-#     scat
-# )
+# Format
 
+# Scale axes equally
+fig.update_yaxes(
+    scaleanchor='x',
+    scaleratio=1,
+)
 
-
-app.layout = html.Div(children=[
-    html.H1(children='My first plot'),
-    html.Div(children=[
-        'Some text in a div.'
-    ]),
-    dcc.Graph(
-        id='my scatter',
-        figure=fig,
+# Make transparent
+fig.update_layout(
+    dict(
+        xaxis=dict(
+            showgrid=False,
+            showticklabels=False,
+        ),
+        yaxis=dict(
+            showgrid=False,
+            showticklabels=False,
+        )
     )
-])
+)
+
+# Add to app
+app.layout = html.Div(
+    children=[
+        html.H1(children='The trees of Vancouver, Canada'),
+        dcc.Graph(
+            id='my scatter',
+            figure=fig,
+            style={
+                'height': '100%',
+            },
+
+        ),
+
+        ],
+    style={
+        'height': '90vh',
+        'background-color': 'black',
+}
+)
 
 if __name__ == "__main__":
     app.run_server(debug=True)

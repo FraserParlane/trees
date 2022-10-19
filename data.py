@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import json
 import os
 
@@ -39,6 +40,10 @@ def clean_tree_data():
 
     # Drop erroneous lon values
     data = data[data['lon'] < 0]
+
+    # Convert lat lon to x and y using a simple conversion
+    data['x'] = data['lon'] * np.cos(data['lat'][0] * np.pi / 180)
+    data['y'] = data['lat']
 
     # Save the processed data
     data.to_csv(path_clean_tree_data, index=False)

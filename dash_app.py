@@ -16,22 +16,22 @@ colors = ["#ea5545", "#f46a9b", "#ef9b20", "#edbf33", "#ede15b", "#bdcf32",
           "#87bc45", "#27aeef", "#b33dc6"]
 
 # Add all trees to map
-fig.add_trace(
-    go.Scattergl(
-        x=data['x'],
-        y=data['y'],
-        mode='markers',
-        marker=dict(
-            color='white',
-            size=4,
-        ),
-        name=f'All trees ({len(data)})',
-        visible='legendonly',
-    )
-)
+# fig.add_trace(
+#     go.Scattermapbox(
+#         lat=data['lat'],
+#         lon=data['lon'],
+#         mode='markers',
+#         marker=dict(
+#             color='white',
+#             size=4,
+#         ),
+#         name=f'All trees ({len(data)})',
+#         visible='legendonly',
+#     )
+# )
 
 freq = data['common_name'].value_counts()
-for i, name in enumerate(freq.index):
+for i, name in enumerate(freq.index[0:2]):
     color = colors[i] if i < 9 else 'white'
     idata = data[data['common_name'] == name]
 
@@ -39,12 +39,12 @@ for i, name in enumerate(freq.index):
     label = f'{name.title()} ({len(idata)})'
 
     # Determine if visible
-    visible = 'legendonly' if i > 2 else None
+    visible = 'legendonly' if i > 8 else None
 
     # Make scatter plot
-    scatter = go.Scattergl(
-        x=idata['x'],
-        y=idata['y'],
+    scatter = go.Scattermapbox(
+        lat=idata['lat'],
+        lon=idata['lon'],
         mode='markers',
         marker=dict(
             color=color,
@@ -80,6 +80,17 @@ fig.update_layout(
         ),
         legend=dict(
             # test='test',
+        ),
+        mapbox=dict(
+            accesstoken="pk.eyJ1IjoiZnJhc2VycGFybGFuZSIsImEiOiJjbDlnODRiZm8wOXA5M3dwdWZvenhsdDl3In0.2fXTi1aTpM_86QcvFbLROA",
+            bearing=0,
+            center=go.layout.mapbox.Center(
+                lat=49.2518,
+                lon=-123.1289
+            ),
+            zoom=12,
+            pitch=0,
+            style='dark',
         )
     )
 )
@@ -96,10 +107,8 @@ app.layout = html.Div(
             style={
                 'height': '100%',
             },
-
         ),
-
-        ],
+    ],
     style={
         'height': '90vh',
     }

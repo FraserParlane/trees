@@ -2,7 +2,8 @@ from data import path_clean_tree_data
 import plotly.graph_objects as go
 from dash import Dash, html, dcc
 import pandas as pd
-
+import numpy as np
+import datetime
 
 # Create the app
 app = Dash(__name__)
@@ -12,26 +13,28 @@ data = pd.read_csv(path_clean_tree_data)
 
 fig = go.Figure()
 
+
 colors = ["#ea5545", "#f46a9b", "#ef9b20", "#edbf33", "#ede15b", "#bdcf32",
           "#87bc45", "#27aeef", "#b33dc6"]
 
-# Add all trees to map
-# fig.add_trace(
-#     go.Scattermapbox(
-#         lat=data['lat'],
-#         lon=data['lon'],
-#         mode='markers',
-#         marker=dict(
-#             color='white',
-#             size=4,
-#         ),
-#         name=f'All trees ({len(data)})',
-#         visible='legendonly',
-#     )
-# )
+# Generate a new column for the labels
+data['label'] = data['common_name'].apply(lambda x: f'<b>{x.title()}</b><br />')
+data['label'] += 'Sci. name: <i>'
+data['label'] += data['genus_name'].apply(lambda x: x.title() + ' ')
+data['label'] += data['species_name'].apply(lambda x: x.lower())
+data['label'] += '</i><br />'
+data['label'] += f'Diameter: '
+data['label'] += data['diameter'].astype(str)
+data['label'] += ' in <br />Planted: '
+data['label'] += data['date_planted'].apply(
+    lambda x: datetime.datetime.strptime(x, '%Y-%m-%d').strftime('%b %d, %Y')
+    if isinstance(x, str) else 'unknown'
+)
+
+# data['date_planted'] YYYY-MM-DD
 
 freq = data['common_name'].value_counts()
-for i, name in enumerate(freq.index[0:2]):
+for i, name in enumerate(freq.index[:10]):
     color = colors[i] if i < 9 else 'white'
     idata = data[data['common_name'] == name]
 
@@ -39,19 +42,22 @@ for i, name in enumerate(freq.index[0:2]):
     label = f'{name.title()} ({len(idata)})'
 
     # Determine if visible
-    visible = 'legendonly' if i > 8 else None
+    visible = 'legendonly' if i > 10 else None
 
     # Make scatter plot
     scatter = go.Scattermapbox(
         lat=idata['lat'],
         lon=idata['lon'],
+        customdata=np.array(idata['label'])[:, None],
         mode='markers',
         marker=dict(
             color=color,
-            size=4,
+            size=5,
         ),
         name=label,
         visible=visible,
+        hoverinfo='skip',
+        hovertemplate='%{customdata[0]}<extra></extra>'
     )
 
     # Add to figure
@@ -80,6 +86,9 @@ fig.update_layout(
         ),
         legend=dict(
             # test='test',
+        ),
+        hoverlabel=dict(
+            bgcolor='white',
         ),
         mapbox=dict(
             accesstoken="pk.eyJ1IjoiZnJhc2VycGFybGFuZSIsImEiOiJjbDlnODRiZm8wOXA5M3dwdWZvenhsdDl3In0.2fXTi1aTpM_86QcvFbLROA",

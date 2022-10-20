@@ -9,6 +9,7 @@ venv
 
 # Python
 *.pyc
+.env
 
 # Environments
 .venv

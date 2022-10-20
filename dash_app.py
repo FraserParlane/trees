@@ -34,7 +34,8 @@ data['label'] += data['date_planted'].apply(
 # data['date_planted'] YYYY-MM-DD
 
 freq = data['common_name'].value_counts()
-for i, name in enumerate(freq.index[:10]):
+top_trees = freq.index[:10]
+for i, name in enumerate(top_trees):
     color = colors[i] if i < 9 else 'white'
     idata = data[data['common_name'] == name]
 
@@ -63,6 +64,25 @@ for i, name in enumerate(freq.index[:10]):
     # Add to figure
     fig.add_trace(scatter)
 
+# Plot all the other trees as one group
+other_trees = data[~data['common_name'].isin(top_trees)]
+scatter = go.Scattermapbox(
+    lat=other_trees['lat'],
+    lon=other_trees['lon'],
+    customdata=np.array(other_trees['label'])[:, None],
+    mode='markers',
+    marker=dict(
+        color='white',
+        size=5,
+        opacity=0.3,
+    ),
+    name=f'All other trees ({len(other_trees)})',
+    visible=True,
+    hoverinfo='skip',
+    hovertemplate='%{customdata[0]}<extra></extra>'
+)
+fig.add_trace(scatter)
+
 # Format
 
 # Scale axes equally
@@ -85,7 +105,9 @@ fig.update_layout(
             showticklabels=False,
         ),
         legend=dict(
-            # test='test',
+            font=dict(
+                color='white',
+            )
         ),
         hoverlabel=dict(
             bgcolor='white',

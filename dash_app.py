@@ -18,14 +18,14 @@ colors = ["#ea5545", "#f46a9b", "#ef9b20", "#edbf33", "#ede15b", "#bdcf32",
           "#87bc45", "#27aeef", "#b33dc6"]
 
 # Generate a new column for the labels
-data['label'] = data['common_name'].apply(lambda x: f'<b>{x.title()}</b><br />')
+data['label'] = data['common_name'].apply(lambda x: f'<a href="https://www.google.com/search?tbm=isch&q={x.title()}">{x.title()}</a><br />')
 data['label'] += 'Sci. name: <i>'
 data['label'] += data['genus_name'].apply(lambda x: x.title() + ' ')
 data['label'] += data['species_name'].apply(lambda x: x.lower())
 data['label'] += '</i><br />'
 data['label'] += f'Diameter: '
 data['label'] += data['diameter'].astype(str)
-data['label'] += ' in <br />Planted: '
+data['label'] += ' in <br />Date planted: '
 data['label'] += data['date_planted'].apply(
     lambda x: datetime.datetime.strptime(x, '%Y-%m-%d').strftime('%b %d, %Y')
     if isinstance(x, str) else 'unknown'
@@ -79,8 +79,6 @@ scatter = go.Scattermapbox(
 )
 fig.add_trace(scatter)
 
-# Format
-
 # Scale axes equally
 fig.update_yaxes(
     scaleanchor='x',
@@ -132,8 +130,22 @@ fig.update_layout(
 app.layout = html.Div(
     children=[
         html.H1(
-            children='The trees of Vancouver, Canada',
+            children='The Trees of Vancouver, Canada',
         ),
+        html.Span(
+            children=[
+                html.A(
+                    href='https://www.google.ca',
+                    children='About this data.'
+                ),
+                ' Made by ',
+                html.A(
+                    href='https://www.parlane.ca',
+                    children='Fraser Parlane.'
+                ),
+            ]
+        ),
+
         dcc.Graph(
             id='my scatter',
             figure=fig,

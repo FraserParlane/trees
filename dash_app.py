@@ -42,9 +42,6 @@ for i, name in enumerate(top_trees):
     # Generate the label
     label = f'{name.title()} ({len(idata)})'
 
-    # Determine if visible
-    visible = 'legendonly' if i > 10 else None
-
     # Make scatter plot
     scatter = go.Scattermapbox(
         lat=idata['lat'],
@@ -56,7 +53,6 @@ for i, name in enumerate(top_trees):
             size=5,
         ),
         name=label,
-        visible=visible,
         hoverinfo='skip',
         hovertemplate='%{customdata[0]}<extra></extra>'
     )
@@ -77,7 +73,7 @@ scatter = go.Scattermapbox(
         opacity=0.3,
     ),
     name=f'All other trees ({len(other_trees)})',
-    visible=True,
+    visible='legendonly',
     hoverinfo='skip',
     hovertemplate='%{customdata[0]}<extra></extra>'
 )
@@ -122,6 +118,12 @@ fig.update_layout(
             zoom=12,
             pitch=0,
             style='dark',
+        ),
+        margin=dict(
+            l=0,
+            r=0,
+            t=0,
+            b=0,
         )
     )
 )
@@ -138,6 +140,9 @@ app.layout = html.Div(
             style={
                 'height': '100%',
             },
+            config={
+                'displayModeBar': False,
+            }
         ),
     ],
     style={
